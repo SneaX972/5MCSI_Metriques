@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactez-nous</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 50%;
+            background: white;
+            padding: 20px;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .message {
+            margin-top: 10px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📩 Contactez-nous</h2>
+    <p>Nous serions ravis de vous aider. Remplissez ce formulaire et nous vous répondrons rapidement.</p>
+
+    <form id="contactForm">
+        <div class="form-group">
+            <label for="nom">Nom :</label>
+            <input type="text" id="nom" name="nom" required>
+        </div>
+
+        <div class="form-group">
+            <label for="prenom">Prénom :</label>
+            <input type="text" id="prenom" name="prenom" required>
+        </div>
+
+        <div class="form-group">
+            <label for="message">Message :</label>
+            <textarea id="message" name="message" rows="4" required></textarea>
+        </div>
+
+        <button type="submit">Envoyer 📬</button>
+    </form>
+
+    <p class="message" id="confirmationMessage" style="display: none;">✅ Votre message a bien été envoyé !</p>
+</div>
+
+<script>
+    document.getElementById("contactForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        document.getElementById("confirmationMessage").style.display = "block";
+        setTimeout(() => document.getElementById("confirmationMessage").style.display = "none", 3000);
+        this.reset();
+    });
+</script>
+
+</body>
+</html>
