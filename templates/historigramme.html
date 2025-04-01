@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Histogramme des températures</title>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+      #loading {
+        font-size: 18px;
+        color: gray;
+        text-align: center;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>📊 Histogramme des températures de Tawarano</h2>
+    
+    <div id="loading">Chargement des données...</div>
+    <div id="bar_chart_div" style="width: 900px; height: 500px; display: none;"></div>
+
+    <script>
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        fetch('/tawarano/')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Erreur lors de la récupération des données.');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (!data.results || data.results.length === 0) {
+              throw new Error('Aucune donnée disponible.');
+            }
+
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn('string', 'Date');
+            dataTable.addColumn('number', 'Température (°C)');
+
+            data.results.forEach(entry => {
+              var date = new Date(entry.Jour * 1000);
+              dataTable.addRow([date.toLocaleDateString('fr-FR'), entry.temp]);
+            });
+
+            var options = {
+              title: '📉 Températures mesurées à Tawarano',
+              chartArea: { width: '60%' },
+              colors: ['#4285F4'],
+              hAxis: {
+                title: 'Date',
+                slantedText: true,
+                slantedTextAngle: 45
+              },
+              vAxis: {
+                title: 'Température (°C)',
+                minValue: 0
+              }
+            };
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('bar_chart_div').style.display = 'block';
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('bar_chart_div'));
+            chart.draw(dataTable, options);
+          })
+          .catch(error => {
+            document.getElementById('loading').innerHTML = '⚠ Erreur : ' + error.message;
+          });
+      }
+    </script>
+  </body>
+</html>
