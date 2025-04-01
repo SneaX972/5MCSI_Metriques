@@ -35,23 +35,29 @@ def contact():
 def histogramme():
     return render_template("histogramme.html")
 
-@app.route('/commits-data/')
-def get_commits_data():
-    response = requests.get(GITHUB_API_URL)
-    commits = response.json()
-
-    minutes_count = Counter()
-
-    for commit in commits:
-        commit_date = commit["commit"]["author"]["date"]
-        date_object = datetime.strptime(commit_date, '%Y-%m-%dT%H:%M:%SZ')
-        minutes_count[date_object.strftime("%H:%M")] += 1  # Format HH:MM
-
-    return jsonify(sorted(minutes_count.items()))
+@app.route('/graph-commits/')
+def graph_commits():
+    return render_template('commits.html')
 
 @app.route('/commits/')
-def commits_page():
-    return render_template('commits.html')
+def commits():
+    url = 'https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits'
+    response = urlopen(url)
+    raw_data = response.read()
+    data = json.loads(raw_data.decode('utf-8'))
+
+    minute_counts = {}
+    for commit in data:
+        date_str = commit['commit']['author']['date']
+        date_object = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+        minute = date_object.minute
+        if minute not in minute_counts:
+            minute_counts[minute] = 1
+        else:
+            minute_counts[minute] += 1
+
+    results = [{'minute': minute, 'commits': count} for minute, count in sorted(minute_counts.items())]
+    return jsonify(results=results)
 
 
 
