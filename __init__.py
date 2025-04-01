@@ -7,6 +7,8 @@ import sqlite3
 
 app = Flask(__name__)
 
+GITHUB_API_URL = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits
+
 @app.route('/')
 def hello_world():
     return render_template('hello.html')
