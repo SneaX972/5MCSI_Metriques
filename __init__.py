@@ -35,6 +35,24 @@ def contact():
 def histogramme():
     return render_template("histogramme.html")
 
+@app.route('/commits-data/')
+def get_commits_data():
+    response = requests.get(GITHUB_API_URL)
+    commits = response.json()
+
+    minutes_count = Counter()
+
+    for commit in commits:
+        commit_date = commit["commit"]["author"]["date"]
+        date_object = datetime.strptime(commit_date, '%Y-%m-%dT%H:%M:%SZ')
+        minutes_count[date_object.strftime("%H:%M")] += 1  # Format HH:MM
+
+    return jsonify(sorted(minutes_count.items()))
+
+@app.route('/commits/')
+def commits_page():
+    return render_template('commits.html')
+
 
 
 
