@@ -1,116 +1,147 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8">
     <title>Analyse des Commits GitHub</title>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <style>
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #eef1f5;
-        margin: 0;
-        padding: 0;
-      }
+        /* 🌟 Style global */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            color: #2c3e50;
+        }
 
-      .container {
-        max-width: 1000px;
-        margin: 50px auto;
-        background-color: white;
-        border-radius: 10px;
-        padding: 40px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      }
+        /* 📌 Conteneur principal */
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
 
-      h1 {
-        text-align: center;
-        color: #2c3e50;
-        margin-bottom: 20px;
-      }
+        .container:hover {
+            transform: scale(1.02);
+        }
 
-      p.description {
-        text-align: center;
-        font-size: 16px;
-        color: #555;
-        margin-bottom: 40px;
-        line-height: 1.6;
-      }
+        /* 🏷️ Titres et descriptions */
+        h1 {
+            color: #1abc9c;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
 
-      #chart_div {
-        width: 100%;
-        height: 500px;
-      }
+        .description {
+            font-size: 15px;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
 
-      footer {
-        text-align: center;
-        color: #aaa;
-        font-size: 14px;
-        margin-top: 40px;
-      }
+        /* 📊 Graphique */
+        #chart_div {
+            width: 100%;
+            height: 450px;
+        }
+
+        /* 📌 Footer */
+        footer {
+            font-size: 13px;
+            color: #777;
+            margin-top: 30px;
+        }
+
+        /* 📱 Responsive */
+        @media (max-width: 600px) {
+            .container {
+                width: 90%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .description {
+                font-size: 14px;
+            }
+        }
     </style>
-  </head>
+</head>
 
-  <body>
+<body>
     <div class="container">
-      <h1>Analyse des Commits GitHub (par minute)</h1>
+        <h1>📈 Analyse des Commits GitHub (minute par minute)</h1>
+        <p class="description">
+            Ce graphique affiche l'activité des commits sur le projet <strong>SneaX972/5MCSI_Metriques</strong>.
+            Chaque barre représente le nombre de commits réalisés par minute.
+        </p>
 
-      <p class="description">
-        Ce graphique représente le nombre de commits réalisés sur le projet
-        <strong>SneaX972/5MCSI_Metriques</strong>, répartis selon les minutes de l'heure (de 00 à 59).
-        Cette visualisation permet d’observer les pics d'activité des contributeurs minute par minute.
-      </p>
+        <div id="chart_div"></div>
 
-      <div id="chart_div"></div>
-
-      <footer>
-        Données récupérées via l’API GitHub – Projet pédagogique 5MCSI
-      </footer>
+        <footer>
+            🔄 Données récupérées via l’API GitHub – Projet 5MCSI 🚀
+        </footer>
     </div>
 
     <script>
-      google.charts.load('current', { packages: ['corechart'] });
-      google.charts.setOnLoadCallback(drawChart);
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
-        fetch('/commits/')
-          .then(response => response.json())
-          .then(data => {
-            const dataTable = new google.visualization.DataTable();
-            dataTable.addColumn('string', 'Minute');
-            dataTable.addColumn('number', 'Commits');
+        function drawChart() {
+            fetch('/commits/')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.results || data.results.length === 0) {
+                        document.getElementById('chart_div').innerHTML = "<p>Aucune donnée disponible.</p>";
+                        return;
+                    }
 
-            data.results.forEach(entry => {
-              dataTable.addRow([entry.minute.toString().padStart(2, '0'), entry.commits]);
-            });
+                    const dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Minute');
+                    dataTable.addColumn('number', 'Commits');
 
-            const options = {
-              title: 'Nombre de commits par minute',
-              titleTextStyle: {
-                fontSize: 18,
-                bold: true,
-                color: '#2c3e50'
-              },
-              hAxis: {
-                title: 'Minute (00 à 59)',
-                slantedText: true,
-                titleTextStyle: { bold: true, italic: false, color: '#34495e' },
-                textStyle: { fontSize: 12 }
-              },
-              vAxis: {
-                title: 'Commits',
-                titleTextStyle: { bold: true, italic: false, color: '#34495e' },
-                minValue: 0,
-                gridlines: { count: 5 }
-              },
-              legend: 'none',
-              colors: ['#3498db'],
-              bar: { groupWidth: '75%' },
-              backgroundColor: 'transparent'
-            };
+                    data.results.forEach(entry => {
+                        const minute = entry.minute.toString().padStart(2, '0'); 
+                        dataTable.addRow([minute, entry.commits]);
+                    });
 
-            const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-            chart.draw(dataTable, options);
-          });
-      }
+                    const options = {
+                        title: 'Commits réalisés minute par minute',
+                        titleTextStyle: { fontSize: 18, bold: true, color: '#2c3e50' },
+                        hAxis: {
+                            title: 'Minute (00 à 59)',
+                            titleTextStyle: { bold: true, color: '#2c3e50' },
+                            slantedText: true,
+                            textStyle: { fontSize: 12, color: '#666' }
+                        },
+                        vAxis: {
+                            title: 'Nombre de commits',
+                            minValue: 0,
+                            gridlines: { count: 6 },
+                            titleTextStyle: { bold: true, color: '#2c3e50' }
+                        },
+                        colors: ['#1abc9c'],
+                        bar: { groupWidth: '70%' },
+                        backgroundColor: 'transparent',
+                        chartArea: { width: '80%', height: '70%' },
+                        legend: { position: 'none' }
+                    };
+
+                    const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+                    chart.draw(dataTable, options);
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des données:', error);
+                    document.getElementById('chart_div').innerHTML = "<p>Erreur lors du chargement des données.</p>";
+                });
+        }
     </script>
-  </body>
+</body>
 </html>
