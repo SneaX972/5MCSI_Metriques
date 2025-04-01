@@ -41,20 +41,24 @@ def graph_commits():
 
 @app.route('/commits-data/')
 def commits_data():
-    url = 'https://api.github.com/repos/SneaX972/5MCSI_Metriques/commits'
-    response = urlopen(url)
-    raw_data = response.read()
-    data = json.loads(raw_data.decode('utf-8'))
+    try:
+        url = 'https://api.github.com/repos/SneaX972/5MCSI_Metriques/commits'
+        response = urlopen(url)
+        raw_data = response.read()
+        data = json.loads(raw_data.decode('utf-8'))
 
-    minute_counts = {}
-    for commit in data:
-        date_str = commit['commit']['author']['date']
-        date_object = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
-        minute = date_object.minute
-        minute_counts[minute] = minute_counts.get(minute, 0) + 1
+        minute_counts = {}
+        for commit in data:
+            date_str = commit['commit']['author']['date']
+            date_object = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+            minute = date_object.minute
+            minute_counts[minute] = minute_counts.get(minute, 0) + 1
 
-    results = [{'minute': minute, 'commits': count} for minute, count in sorted(minute_counts.items())]
-    return jsonify(results=results)
+        results = [{'minute': minute, 'commits': count} for minute, count in sorted(minute_counts.items())]
+        return jsonify(results=results)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 
